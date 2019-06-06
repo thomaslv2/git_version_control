@@ -1,0 +1,100 @@
+{% extends 'master/base.html' %}
+{% block body %}
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+
+                    <div class="btn btn-sm btn-success create-btn">新增用户</div>
+
+                    <div class="box-tools  pull-right">
+                        <form action="" method="get">
+                            <div class="input-group input-group-sm" style="width: 150px;">
+                                <input type="text" name="table_search" class="form-control pull-right"
+                                       placeholder="Search">
+
+                                <div class="input-group-btn">
+                                    <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body table-responsive no-padding text-center">
+                    <table class="table table-hover">
+                        <tr>
+                            <td>用户名</td>
+                            <td>邮箱</td>
+                            <td>role</td>
+                            <td>部门</td>
+                            <td>权限</td>
+                            <td>手机号</td>
+                            <td>操作</td>
+                        </tr>
+                        {% for user in users %}
+                            <tr>
+                                <td>{{ user.name }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.get_role_display }}</td>
+                                <td>{{ user.department|default_if_none:"" }}</td>
+                                <td>{{ user.get_isAdmin_display }}</td>
+                                <td>{{ user.phone|default_if_none:"" }}</td>
+                                <td>
+                                    <!-- 同一个页面的id不可以重复-->
+                                    <!-- 同一个页面的id不可以重复-->
+                                    <!-- 同一个页面的id不可以重复-->
+                                    <div data-url="{% url 'edituser' user.pk %}"
+                                            class="btn btn-xs btn-success edit-user">编辑
+                                    </div>
+                                    <div data-url="{% url 'deluser' user.pk %}"  class="btn btn-xs btn-warning del-user">
+                                        删除
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+
+                    </table>
+                    <div class="box-footer clearfix pull-right">
+
+                        <ul class="pagination pagination-sm no-margin">
+                            {{ page_html|safe }}
+                        </ul>
+                    </div>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+    </div>
+    <!-- ./col -->
+{% endblock %}
+{% block js %}
+    <script>
+        $("#user").addClass("active");
+        $(".create-btn").on("click", function () {
+            ui.box({
+                "title": "创建用户",
+                "remote":{% url 'createuser' %},
+
+            });
+        })
+        $(".edit-user").on("click", function () {
+            ui.box({
+                "title": "编辑用户",
+                "remote": $(this).attr("data-url"),
+
+            });
+        })
+        $(".del-user").on("click", function (e) {
+            e.preventDefault(); //取消原来自带的属性
+            var url=$(this).attr("data-url");
+            ui.confirm("请确认是否删除本条记录",function () {
+                Net.get({
+                    url: url,
+                    reload:true
+                })
+            });
+        })
+    </script>
+{% endblock %}

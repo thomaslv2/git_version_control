@@ -1,0 +1,79 @@
+{% extends 'master/base.html' %}
+{% block body %}
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+
+                    <a href="{% url 'createcomm' %}" class="btn btn-sm btn-success create-btn">执行命令</a>
+
+                    <div class="box-tools  pull-right">
+                        <form action="" method="get">
+                            <div class="input-group input-group-sm" style="width: 150px;">
+                                <input type="text" name="table_search" class="form-control pull-right"
+                                       placeholder="Search">
+
+                                <div class="input-group-btn">
+                                    <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body table-responsive no-padding text-center">
+                    <table class="table table-hover">
+                        <tr>
+                            <td>命令</td>
+                            <td>主机列表</td>
+                            <td>执行时间</td>
+                            {% if user.isAdmin == "0" %}
+                                <td>执行用户</td>
+                            {% endif %}
+
+                        </tr>
+                        {% for com in comms %}
+                            <tr>
+                                <td>
+                                    <pre>{{ com.command }}</pre></td>
+                                <td>
+                                    <pre>{{ com.hosts_list }}</pre>
+                                </td>
+                                <td>{{ com.create_time|date:"Y-m-d H:i:s" }}</td>
+                                {% if user.isAdmin == "0" %}
+                                    <td>{{ com.user.name }}</td>
+                                {% endif %}
+
+                            </tr>
+                        {% endfor %}
+
+                    </table>
+                    <div class="box-footer clearfix pull-right">
+
+                        <ul class="pagination pagination-sm no-margin">
+                            {{ page_html|safe }}
+                        </ul>
+                    </div>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+    </div>
+    <!-- ./col -->
+{% endblock %}
+{% block js %}
+    <script>
+        $("#command").addClass("active");
+        $(".del-btn").on("click", function (e) {
+            e.preventDefault(); //取消原来自带的属性
+            var url = $(this).attr("data-url");
+            ui.confirm("请确认是否删除本条记录", function () {
+                Net.get({
+                    url: url,
+                    reload: true
+                })
+            });
+        })
+    </script>
+{% endblock %}
